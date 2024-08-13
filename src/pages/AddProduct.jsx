@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaPlus } from "react-icons/fa";
+import toast from "react-hot-toast";
+import { BeatLoader } from "react-spinners";
 
 const AddProduct = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +13,32 @@ const AddProduct = () => {
     category: "",
     brand: "",
   });
+
+  const [categories, setCategories] = useState([]);
+
+  const [addCategory, setAddCategory] = useState(false);
+  const [newCategory, setNewCategory] = useState();
+
+  const [loading, setLoading] = useState("false");
+
+  useEffect(() => {
+    async function getCategories() {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_SERVERAPI}/api/v1/category`
+        );
+        if (response.data.success) {
+          setCategories(response.data.categories);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Something went wrong with the contact form");
+      } finally {
+        setLoading(false);
+      }
+    }
+    getCategories();
+  }, []);
 
   const [imagePreview, setImagePreview] = useState(null);
 
@@ -29,7 +57,7 @@ const AddProduct = () => {
     e.preventDefault();
 
     const formDataToSend = new FormData();
-    formDataToSend.append("image", formData.image);
+    formDataToSend.append("productImage", formData.image);
     formDataToSend.append("name", formData.name);
     formDataToSend.append("description", formData.description);
     formDataToSend.append("price", formData.price);
@@ -38,7 +66,7 @@ const AddProduct = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/products",
+        `${import.meta.env.VITE_SERVERAPI}/api/v1/products`,
         formDataToSend,
         {
           headers: {
@@ -46,11 +74,48 @@ const AddProduct = () => {
           },
         }
       );
-      console.log("Product added successfully", response.data);
+      if (response.data.success) {
+        toast.success(response.data.message);
+        setFormData({
+          image: null,
+          name: "",
+          description: "",
+          price: "",
+          category: "",
+          brand: "",
+        });
+        setImagePreview(null);
+        console.log("Product added successfully", response.data);
+      } else {
+        toast.error("smthng went wrong");
+      }
       // Handle success (e.g., redirect, show a message)
     } catch (error) {
       console.error("Error adding product", error);
       // Handle error (e.g., show an error message)
+    }
+  };
+
+  const addCategoryHandler = async (e) => {
+    setLoading(true);
+    console.log(newCategory);
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_SERVERAPI}/api/v1/category`,
+        { title: newCategory }
+      );
+      if (response.data.success) {
+        setCategories(response.data.categories);
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong with the contact form");
+    } finally {
+      setLoading(false);
+      setAddCategory(false);
     }
   };
 
@@ -130,7 +195,7 @@ const AddProduct = () => {
               >
                 Category
               </label>
-              <input
+              {/* <input
                 type="text"
                 name="category"
                 id="category"
@@ -138,7 +203,69 @@ const AddProduct = () => {
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
-              />
+              /> */}
+              {loading ? (
+                <div className="d-flex">
+                  Please wait <BeatLoader color="black" size={20} />
+                </div>
+              ) : addCategory ? (
+                <>
+                  <input
+                    type="text"
+                    placeholder="Category Name"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                  />
+                  <button
+                    className={`p-2 bg-green-800 text-white rounded-md m-2 ${
+                      loading ? "cursor-wait" : ""
+                    }`}
+                    onClick={addCategoryHandler}
+                    disabled={loading}
+                  >
+                    {loading ? "Adding" : "Add"}
+                  </button>
+                  <button
+                    className="p-2 bg-red-800 text-white rounded-md m-2"
+                    onClick={() => setAddCategory(false)}
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <select
+                  name="category"
+                  id="blogcategory"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={formData.category}
+                  onChange={(e) => {
+                    if (e.target.value === "add-new") {
+                      setAddCategory(true);
+                    } else {
+                      setFormData((prev) => ({
+                        ...prev,
+                        ["category"]: e.target.value,
+                      }));
+                    }
+                  }}
+                  required
+                >
+                  <option value="">Choose...</option>
+                  {!loading && categories && categories.length ? (
+                    categories.map((x, i) => (
+                      <option value={x._id} key={i}>
+                        {x.title}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="" disabled>
+                      No categories
+                    </option>
+                  )}
+                  <option value="add-new">+ Add Category</option>
+                </select>
+              )}
             </div>
             <div className="w-full pl-2">
               <label

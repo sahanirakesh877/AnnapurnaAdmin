@@ -1,20 +1,15 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import {toast} from "react-hot-toast"
-
+import toast from "react-hot-toast";
 
 const Login = () => {
-
   const navigate = useNavigate();
-
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-
-
 
   const handleChange = (e) => {
     setFormData({
@@ -22,8 +17,6 @@ const Login = () => {
       [e.target.name]: e.target.value,
     });
   };
-
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,7 +28,6 @@ const Login = () => {
 
       const { user_token } = response.data;
       localStorage.setItem("token", user_token);
-
 
       toast.success("Login successful!");
       setFormData({

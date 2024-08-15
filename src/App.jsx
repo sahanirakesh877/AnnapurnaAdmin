@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
+import ProductDetails from "./pages/productDetails";
 import Logout from "./pages/Logout";
 
 const App = () => {
@@ -21,7 +22,11 @@ const App = () => {
         <Routes>
           {localStorage.getItem("token") ? (
             <>
-            
+               <Route path="/" element={<Home />} />
+          <Route path="/:id" element={<ProductDetails />} />
+          <Route path="/:id/edit" element={<AddProduct edit={true} />} />
+
+          <Route path="/addproducts" element={<AddProduct />} />
             <Route path="/" element={<Home />} />
             <Route path="/addproducts" element={<AddProduct />} />
             <Route path="/editproduct" element={<EditProduct />} />

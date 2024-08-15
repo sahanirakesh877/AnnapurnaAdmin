@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import {toast} from "react-hot-toast"
+import toast from "react-hot-toast";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -26,12 +26,9 @@ const Register = () => {
         formData
       );
 
-
       // const { user_token } = response.data;
       // localStorage.setItem("token", user_token);
 
-
-      
       toast.success("Registration successful!");
 
       // Clear the form
@@ -51,7 +48,6 @@ const Register = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-   
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center">
           Register

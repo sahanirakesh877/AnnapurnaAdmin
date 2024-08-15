@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
+import ProductDetails from "./pages/productDetails";
 
 const App = () => {
   return (
@@ -15,8 +16,10 @@ const App = () => {
       <div className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/:id" element={<ProductDetails />} />
+          <Route path="/:id/edit" element={<AddProduct edit={true} />} />
+
           <Route path="/addproducts" element={<AddProduct />} />
-          <Route path="/editproduct" element={<EditProduct />} />
 
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />

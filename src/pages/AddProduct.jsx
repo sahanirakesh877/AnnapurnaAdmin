@@ -3,8 +3,61 @@ import axios from "axios";
 import { FaPlus } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { BeatLoader } from "react-spinners";
+import { useNavigate, useParams } from "react-router-dom";
 
-const AddProduct = () => {
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import {
+  ClassicEditor,
+  Bold,
+  Essentials,
+  Heading,
+  Indent,
+  IndentBlock,
+  Italic,
+  Link,
+  List,
+  MediaEmbed,
+  Paragraph,
+  Table,
+  Undo,
+} from "ckeditor5";
+import "ckeditor5/ckeditor5.css";
+
+const AddProduct = ({ edit, reupload }) => {
+  const navigate = useNavigate();
+  let id;
+  if (edit) {
+    id = useParams().id;
+  }
+
+  useEffect(() => {
+    async function getSelectedProduct() {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_SERVERAPI}/api/v1/products/${id}`
+        );
+        console.log(response.data);
+        if (response.data.success) {
+          setFormData({
+            brand: response.data.product.brand,
+            category: response.data.product.category._id,
+            description: response.data.product.desc,
+            name: response.data.product.name,
+            price: response.data.product.price,
+          });
+        }
+      } catch (err) {
+        console.error(err);
+        alert(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (edit) {
+      getSelectedProduct();
+    }
+  }, [id]);
+
   const [formData, setFormData] = useState({
     image: null,
     name: "",
@@ -20,6 +73,8 @@ const AddProduct = () => {
   const [newCategory, setNewCategory] = useState();
 
   const [loading, setLoading] = useState("false");
+
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     async function getCategories() {
@@ -56,6 +111,8 @@ const AddProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setSubmitting(true);
+
     const formDataToSend = new FormData();
     formDataToSend.append("productImage", formData.image);
     formDataToSend.append("name", formData.name);
@@ -85,6 +142,7 @@ const AddProduct = () => {
           brand: "",
         });
         setImagePreview(null);
+        navigate("/");
         console.log("Product added successfully", response.data);
       } else {
         toast.error("smthng went wrong");
@@ -93,6 +151,55 @@ const AddProduct = () => {
     } catch (error) {
       console.error("Error adding product", error);
       // Handle error (e.g., show an error message)
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleEdit = async (e) => {
+    e.preventDefault();
+
+    setSubmitting(true);
+
+    const formDataToSend = new FormData();
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("description", formData.description);
+    formDataToSend.append("price", formData.price);
+    formDataToSend.append("category", formData.category);
+    formDataToSend.append("brand", formData.brand);
+
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_SERVERAPI}/api/v1/products/${id}`,
+        {
+          name: formData.name,
+          description: formData.description,
+          price: formData.price,
+          category: formData.category,
+          brand: formData.brand,
+        }
+      );
+      if (response.data.success) {
+        toast.success(response.data.message);
+        setFormData({
+          image: null,
+          name: "",
+          description: "",
+          price: "",
+          category: "",
+          brand: "",
+        });
+        console.log("Product edited successfully", response.data);
+        navigate(`/${id}`);
+      } else {
+        toast.error(response.data.message);
+      }
+      // Handle success (e.g., redirect, show a message)
+    } catch (error) {
+      console.error("Error adding product", error);
+      // Handle error (e.g., show an error message)
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -123,33 +230,37 @@ const AddProduct = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
       <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-lg">
         <h2 className="text-2xl font-bold text-gray-800 text-center">
-          Add Product
+          {edit ? "Edit" : "Add"} Product
         </h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={edit ? handleEdit : handleSubmit}>
           <div className="mb-1 text-center relative">
-            <input
-              type="file"
-              name="image"
-              id="image"
-              onChange={handleChange}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              required
-            />
-            <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-full mx-auto flex items-center justify-center relative">
-              {imagePreview ? (
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-full h-full object-cover rounded-full"
+            {!edit && (
+              <>
+                <input
+                  type="file"
+                  name="image"
+                  id="image"
+                  onChange={handleChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  required
                 />
-              ) : (
-                <FaPlus className="text-gray-500 text-3xl" />
-              )}
-            </div>
-            <label
-              htmlFor="image"
-              className="absolute inset-0 flex items-center justify-center cursor-pointer"
-            ></label>
+                <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-full mx-auto flex items-center justify-center relative">
+                  {imagePreview ? (
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <FaPlus className="text-gray-500 text-3xl" />
+                  )}
+                </div>
+                <label
+                  htmlFor="image"
+                  className="absolute inset-0 flex items-center justify-center cursor-pointer"
+                ></label>
+              </>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -293,7 +404,7 @@ const AddProduct = () => {
             >
               Description
             </label>
-            <textarea
+            {/* <textarea
               name="description"
               id="description"
               value={formData.description}
@@ -301,13 +412,65 @@ const AddProduct = () => {
               rows="4"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
+            /> */}
+            <CKEditor
+              editor={ClassicEditor}
+              id="blogDescription"
+              config={{
+                toolbar: [
+                  "undo",
+                  "redo",
+                  "|",
+                  "heading",
+                  "|",
+                  "bold",
+                  "italic",
+                  "|",
+                  "link",
+                  "insertTable",
+                  "mediaEmbed",
+                  "|",
+                  "bulletedList",
+                  "numberedList",
+                  "indent",
+                  "outdent",
+                ],
+                plugins: [
+                  Bold,
+                  Essentials,
+                  Heading,
+                  Indent,
+                  IndentBlock,
+                  Italic,
+                  Link,
+                  List,
+                  MediaEmbed,
+                  Paragraph,
+                  Table,
+                  Undo,
+                ],
+              }}
+              data={formData.description}
+              onReady={(editor) => {
+                editorRef.current = editor;
+              }}
+              onChange={(event, editor) => {
+                const data = editor.getData();
+                setFormData((prev) => ({
+                  ...prev,
+                  description: data,
+                }));
+              }}
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition duration-300"
+            className={`w-full bg-red-600 text-white py-2 px-4 rounded-lg  transition duration-300 ${
+              submitting ? "cursor-wait bg-red-300" : "hover:bg-red-700"
+            }`}
+            disabled={submitting}
           >
-            Add Product
+            {edit ? "Edit Product" : "Add Product"}
           </button>
         </form>
       </div>

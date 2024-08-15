@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import Footer from "../components/Footer";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const Home = () => {
   const navigate = useNavigate();
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // const products = [
   //   {
@@ -56,6 +58,22 @@ const Home = () => {
     getProducts();
   }, []);
 
+  async function handleDelete(id) {
+    try {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_SERVERAPI}/api/v1/products/${id}`
+      );
+      if (response.data.success) {
+        toast.success(response.data.message);
+        setProducts(response.data.products);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  console.log(products);
+
   return (
     <>
       <div className="flex flex-col min-h-screen w-full">
@@ -89,22 +107,35 @@ const Home = () => {
                   <tr key={product.id} className="hover:bg-gray-50">
                     <td className="px-4 py-2 border-b flex justify-center">
                       <img
-                        src={product.image}
+                        src={`${
+                          import.meta.env.VITE_SERVERAPI
+                        }/${product.image.replace(/\\/g, "/")}`}
                         alt={product.name}
                         className="w-24 h-24 object-cover rounded-lg"
                       />
                     </td>
                     <td className="px-4 py-2 border-b">{product.name}</td>
-                    <td className="px-4 py-2 border-b">{product.category}</td>
-                    <td className="px-4 py-2 border-b">{product.price}</td>
+                    <td className="px-4 py-2 border-b">
+                      {product.category.title}
+                    </td>
+                    <td className="px-4 py-2 border-b">Rs {product.price}</td>
                     <td className="px-4 py-2 border-b flex items-center">
-                      <button
+                      <Link
+                        to={`/${product._id}`}
+                        className="px-2 py-1 bg-blue-500 text-white rounded mr-2 hover:bg-blue-600 transition duration-300"
+                      >
+                        View
+                      </Link>
+                      {/* <button
                         onClick={() => navigate("/editproduct")}
                         className="px-2 py-1 bg-blue-500 text-white rounded mr-2 hover:bg-blue-600 transition duration-300"
                       >
                         Edit
-                      </button>
-                      <button className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300">
+                      </button> */}
+                      <button
+                        className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300"
+                        onClick={() => handleDelete(product._id)}
+                      >
                         Delete
                       </button>
                     </td>

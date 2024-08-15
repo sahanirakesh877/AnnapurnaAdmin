@@ -57,6 +57,8 @@ const Home = () => {
   }, []);
 
   return (
+    !loading && (
+
     <>
       <div className="flex flex-col min-h-screen w-full">
         <main className="flex-grow bg-gray-100 px-6">
@@ -117,6 +119,7 @@ const Home = () => {
         <Footer />
       </div>
     </>
+    )
   );
 };
 

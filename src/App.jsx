@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import SideBar from "./components/SideBar";
@@ -8,21 +8,41 @@ import Login from "./pages/Login";
 import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
 import ProductDetails from "./pages/productDetails";
+import Logout from "./pages/Logout";
 
 const App = () => {
+
+
+  const [token , setToken] = useState()
+
   return (
     <div className="flex h-screen">
       <SideBar />
       <div className="flex-grow">
         <Routes>
-          <Route path="/" element={<Home />} />
+          {localStorage.getItem("token") ? (
+            <>
+               <Route path="/" element={<Home />} />
           <Route path="/:id" element={<ProductDetails />} />
           <Route path="/:id/edit" element={<AddProduct edit={true} />} />
 
           <Route path="/addproducts" element={<AddProduct />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/addproducts" element={<AddProduct />} />
+            <Route path="/editproduct" element={<EditProduct />} />
+  
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/logout" element={<Logout />} />
+            </>
 
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
+          ) : (
+            <>
+            
+            <Route path="*" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            </>
+          )}
         </Routes>
       </div>
     </div>

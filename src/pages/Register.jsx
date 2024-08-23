@@ -29,15 +29,18 @@ const Register = () => {
       // const { user_token } = response.data;
       // localStorage.setItem("token", user_token);
 
-      toast.success("Registration successful!");
-
-      // Clear the form
-      setFormData({
-        name: "",
-        email: "",
-        password: "",
-      });
-      navigate("/login");
+      if (response.data.success) {
+        toast.success(response.data.message);
+        // Clear the form
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+        });
+        navigate("/login");
+      } else {
+        toast.error(response.data.message);
+      }
 
       console.log("Registration successful", response.data);
     } catch (error) {

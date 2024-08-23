@@ -1,13 +1,17 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { authAction } from "../redux/authSlice";
 
 const Logout = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
+    dispatch(authAction.setLoggedInUser(null));
 
-    navigate('/register');
+    navigate("/register");
   }, [navigate]);
 
   return null;

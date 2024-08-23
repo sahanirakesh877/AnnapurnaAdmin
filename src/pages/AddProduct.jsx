@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { FaPlus } from "react-icons/fa";
 import toast from "react-hot-toast";
@@ -30,6 +30,8 @@ const AddProduct = ({ edit, reupload }) => {
     id = useParams().id;
   }
 
+  const editorRef = useRef();
+
   useEffect(() => {
     async function getSelectedProduct() {
       try {
@@ -40,7 +42,10 @@ const AddProduct = ({ edit, reupload }) => {
         if (response.data.success) {
           setFormData({
             brand: response.data.product.brand,
-            category: response.data.product.category._id,
+            category:
+              response.data.product.category && response.data.product.category
+                ? response.data.product.category._id
+                : null,
             description: response.data.product.desc,
             name: response.data.product.name,
             price: response.data.product.price,

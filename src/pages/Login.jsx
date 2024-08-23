@@ -2,9 +2,13 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { authAction } from "../redux/authSlice";
 
 const Login = () => {
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -26,15 +30,26 @@ const Login = () => {
         formData
       );
 
-      const { user_token } = response.data;
-      localStorage.setItem("token", user_token);
+      if (response.data.success) {
+        const { user_token } = response.data;
+        localStorage.setItem("token", user_token);
 
-      toast.success("Login successful!");
-      setFormData({
-        email: "",
-        password: "",
-      });
-      navigate("/");
+        toast.success("Login successful!");
+        setFormData({
+          email: "",
+          password: "",
+        });
+        dispatch(
+          authAction.setLoggedInUser({
+            email: response.data.email,
+            name: response.data.name,
+          })
+        );
+        navigate("/");
+      } else {
+        toast.error("something went wrong logging in");
+      }
+
       console.log("Login successful", response.data);
     } catch (error) {
       toast.error("Error during login");

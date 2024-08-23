@@ -63,7 +63,12 @@ export default function ProductDetails() {
             </div>
             <h2>{selectedProduct.name}</h2>
             <div>Brand: {selectedProduct.brand}</div>
-            <div>Category: {selectedProduct.category.title}</div>
+            <div>
+              Category:{" "}
+              {selectedProduct.category && selectedProduct.category.title
+                ? selectedProduct.category.title
+                : "please specify category again"}
+            </div>
             <div>Price: Rs{selectedProduct.price}</div>
             <div>
               Description: <SafeHtml htmlString={selectedProduct.desc} />

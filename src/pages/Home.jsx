@@ -11,33 +11,6 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // const products = [
-  //   {
-  //     id: 1,
-  //     image: "https://via.placeholder.com/150",
-  //     name: "Product 1",
-  //     category: "Category 1",
-  //     price: "$10",
-  //     stock: 100,
-  //   },
-  //   {
-  //     id: 2,
-  //     image: "https://via.placeholder.com/150",
-  //     name: "Product 2",
-  //     category: "Category 2",
-  //     price: "$20",
-  //     stock: 50,
-  //   },
-  //   {
-  //     id: 3,
-  //     image: "https://via.placeholder.com/150",
-  //     name: "Product 3",
-  //     category: "Category 3",
-  //     price: "$30",
-  //     stock: 75,
-  //   },
-  // ];
-
   useEffect(() => {
     async function getProducts() {
       setLoading(true);
@@ -61,11 +34,18 @@ const Home = () => {
   async function handleDelete(id) {
     try {
       const response = await axios.delete(
-        `${import.meta.env.VITE_SERVERAPI}/api/v1/products/${id}`
+        `${import.meta.env.VITE_SERVERAPI}/api/v1/products/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       if (response.data.success) {
         toast.success(response.data.message);
         setProducts(response.data.products);
+      } else {
+        toast.error(response.data.message);
       }
     } catch (err) {
       console.error(err);
@@ -73,6 +53,20 @@ const Home = () => {
   }
 
   console.log(products);
+
+  if (!loading && products.length < 1) {
+    return (
+      <div className="h-full w-full border border-black flex justify-center items-center text-xl font-semibold flex-col">
+        <p>No Products to show.</p>
+        <Link
+          to="/addproducts"
+          className="border border-black p-2 rounded-md mt-4"
+        >
+          Add Product
+        </Link>
+      </div>
+    );
+  }
 
   return (
     !loading && (
@@ -84,49 +78,52 @@ const Home = () => {
             </h2>
 
             <div className="overflow-x-auto">
-              <table className="min-w-full bg-white rounded-lg shadow-md">
-                <thead className="bg-red-400">
+              <table className="min-w-full bg-white rounded-lg shadow-md border-2 mb-8 text-lg py-6">
+                <thead className="bg-[#16189e] text-white text-left">
                   <tr>
-                    <th className="px-4 py-2 border-b-2 border-gray-300">
+                    <th className="px-4 py-2 border-2 border-gray-300">
                       Image
                     </th>
-                    <th className="px-4 py-2 border-b-2 border-gray-300">
-                      Name
-                    </th>
-                    <th className="px-4 py-2 border-b-2 border-gray-300">
+                    <th className="px-4 py-2 border-2 border-gray-300">Name</th>
+                    <th className="px-4 py-2 border-2 border-gray-300">
                       Category
                     </th>
-                    <th className="px-4 py-2 border-b-2 border-gray-300">
+                    <th className="px-4 py-2 border-2 border-gray-300">
                       Price
                     </th>
 
-                    <th className="px-4 py-2 border-b-2 border-gray-300">
+                    <th className="px-4 py-2 border-2 border-gray-300">
                       Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((product) => (
-                    <tr key={product.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-2 border-b flex justify-center">
+                  {products.map((product, index) => (
+                    <tr
+                      key={index}
+                      className="hover:bg-gray-50 border-b-2 text-black "
+                    >
+                      <td className="px-4 py-2 flex justify-center ">
                         <img
                           src={`${
                             import.meta.env.VITE_SERVERAPI
                           }/${product.image.replace(/\\/g, "/")}`}
                           alt={product.name}
-                          className="w-24 h-24 object-cover rounded-lg"
+                          className="h-52 w-60 object-cover rounded-lg"
                         />
                       </td>
-                      <td className="px-4 py-2 border-b">{product.name}</td>
-                      <td className="px-4 py-2 border-b">
+                      <td className="px-4 py-2 border-x-2">{product.name}</td>
+                      <td className="px-4 py-2 border-r-2">
                         {product.category && product.category.title
                           ? product.category.title
                           : "please specify category again"}
                       </td>
-                      <td className="px-4 py-2 border-b">Rs {product.price}</td>
-                      <td className="px-4 py-2 border-b flex items-center">
+                      <td className="px-4 py-2 border-r-2">
+                        Rs {product.price}
+                      </td>
+                      <td className="px-4 py-2 flex justify-center items-center">
                         <Link
-                          to={`/${product._id}`}
+                          to={`/product/${product._id}`}
                           className="px-2 py-1 bg-blue-500 text-white rounded mr-2 hover:bg-blue-600 transition duration-300"
                         >
                           View

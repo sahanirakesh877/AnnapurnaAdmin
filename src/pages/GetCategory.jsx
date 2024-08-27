@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -63,12 +63,16 @@ const GetCategory = () => {
 
         {loading ? (
           <div className="text-center py-4">Loading categories...</div>
+        ) : category.length < 1 ? (
+          <div className="text-center text-lg">
+            No Categories Found. Add some products
+          </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full bg-white rounded-lg shadow-md">
-              <thead className="bg-red-400">
+            <table className="min-w-full bg-white rounded-lg shadow-md border">
+              <thead className="bg-[#16189e] text-white text-left">
                 <tr>
-                  <th className="px-4 py-2 border-b-2 border-gray-300">
+                  <th className="px-4 py-2 border-b-2 border-gray-300 border-r-2">
                     Category
                   </th>
                   <th className="px-4 py-2 border-b-2 border-gray-300">
@@ -79,10 +83,16 @@ const GetCategory = () => {
               <tbody>
                 {category.map((cat) => (
                   <tr key={cat.id} className="hover:bg-gray-200">
-                    <td className="px-4 py-2 border-b text-center">
+                    <td className="px-4 py-2 border-b text-center border-r-2">
                       {cat.title}
                     </td>
                     <td className="px-4 py-2 border-b flex items-center text-start">
+                      <Link
+                        to={`/getcategory/${cat._id}`}
+                        className="px-2 py-1 bg-blue-500 text-white rounded mr-2 hover:bg-blue-600 transition duration-300"
+                      >
+                        View Products
+                      </Link>
                       <button
                         onClick={() => handleDelete(cat._id)}
                         className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300 "

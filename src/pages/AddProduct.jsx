@@ -133,6 +133,7 @@ const AddProduct = ({ edit, reupload }) => {
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
@@ -182,6 +183,11 @@ const AddProduct = ({ edit, reupload }) => {
           price: formData.price,
           category: formData.category,
           brand: formData.brand,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
       );
       if (response.data.success) {
@@ -214,7 +220,12 @@ const AddProduct = ({ edit, reupload }) => {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_SERVERAPI}/api/v1/category`,
-        { title: newCategory }
+        { title: newCategory },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       if (response.data.success) {
         setCategories(response.data.categories);

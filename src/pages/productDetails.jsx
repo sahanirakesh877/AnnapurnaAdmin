@@ -37,11 +37,18 @@ export default function ProductDetails() {
   async function handleDelete() {
     try {
       const response = await axios.delete(
-        `${import.meta.env.VITE_SERVERAPI}/api/v1/products/${id}`
+        `${import.meta.env.VITE_SERVERAPI}/api/v1/products/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       if (response.data.success) {
         toast.success(response.data.message);
         navigate("/");
+      } else {
+        toast.error(response.data.message);
       }
     } catch (err) {
       console.error(err);
@@ -76,7 +83,7 @@ export default function ProductDetails() {
             <div>Added At: {selectedProduct.createdAt}</div>
           </div>
           <Link
-            to={`/${id}/edit`}
+            to={`/product/${id}/edit`}
             className="px-2 py-1 bg-blue-500 text-white rounded mr-2 hover:bg-blue-600 transition duration-300"
           >
             Edit

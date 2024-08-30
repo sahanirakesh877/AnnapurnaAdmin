@@ -11,7 +11,7 @@ const Logout = () => {
     localStorage.removeItem("token");
     dispatch(authAction.setLoggedInUser(null));
 
-    navigate("/register");
+    navigate("/");
   }, [navigate]);
 
   return null;

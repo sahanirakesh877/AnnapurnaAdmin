@@ -73,7 +73,7 @@ const App = () => {
         setAdminStat("down");
       }
     }
-    if (!localStorage.getItem("token")) {
+    if (!loggedInUser) {
       checkServerStatus();
     }
   }, [loggedInUser]);
@@ -116,7 +116,7 @@ const App = () => {
   }
 
   return (
-    <div className="flex h-screen">
+    <div className="flex ">
       <SideBar />
       <div className="flex-grow">
         <Suspense fallback={<div className="w-full h-full">Loading...</div>}>

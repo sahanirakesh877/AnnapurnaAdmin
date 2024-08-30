@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { DeleteConfirmation } from "../components/deleteConfirmation";
 
 const GetCategory = () => {
   const [category, setCategory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  const [delCon, setDelCon] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -34,7 +37,12 @@ const GetCategory = () => {
     setDeleting(true);
     try {
       const response = await axios.delete(
-        `${import.meta.env.VITE_SERVERAPI}/api/v1/category/${id}`
+        `${import.meta.env.VITE_SERVERAPI}/api/v1/category/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       if (response.data.success) {
         toast.success(response.data.message);
@@ -46,9 +54,11 @@ const GetCategory = () => {
       } else {
         toast.error("Failed to delete the category");
       }
+      setDeleting(false);
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong while deleting the category");
+      setDeleting(false);
     } finally {
       setDeleting(false);
     }
@@ -82,7 +92,7 @@ const GetCategory = () => {
               </thead>
               <tbody>
                 {category.map((cat) => (
-                  <tr key={cat.id} className="hover:bg-gray-200">
+                  <tr key={cat._id} className="hover:bg-gray-200">
                     <td className="px-4 py-2 border-b text-center border-r-2">
                       {cat.title}
                     </td>
@@ -94,12 +104,23 @@ const GetCategory = () => {
                         View Products
                       </Link>
                       <button
-                        onClick={() => handleDelete(cat._id)}
+                        // onClick={() => handleDelete(cat._id)}
+                        onClick={() => setDelCon(true)}
                         className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300 "
                         disabled={deleting}
                       >
                         {deleting ? "Deleting..." : "Delete"}
                       </button>
+                      {delCon && (
+                        <DeleteConfirmation
+                          type={"category"}
+                          name={cat.title}
+                          delFunc={() => {
+                            handleDelete(cat._id);
+                          }}
+                          setDelCon={setDelCon}
+                        />
+                      )}
                     </td>
                   </tr>
                 ))}

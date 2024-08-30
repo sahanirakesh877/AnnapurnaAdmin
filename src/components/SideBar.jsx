@@ -8,7 +8,7 @@ const SideBar = () => {
   console.log(loggedInUser);
 
   return (
-    <aside className="w-64 bg-gray-800 text-white flex flex-col">
+    <aside className="w-64 bg-gray-800 text-white flex flex-col sticky top-0 h-screen">
       <div className="p-4">
         <h1 className="text-2xl font-bold">Annapurna</h1>
       </div>

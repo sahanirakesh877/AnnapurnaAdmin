@@ -28,12 +28,11 @@ const Register = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/v1/register",
+        `${import.meta.env.VITE_SERVERAPI}/api/v1/register`,
         formData
       );
 
       if (response.data.success) {
-        toast.success(response.data.message);
         setFormData({
           name: "",
           email: "",

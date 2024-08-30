@@ -243,12 +243,19 @@ const AddProduct = ({ edit, reupload }) => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+    <div
+      className={`flex items-center justify-center min-h-screen bg-gray-100 p-4 ${
+        submitting && "opacity-60 cursor-not-allowed"
+      }`}
+    >
       <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-lg">
         <h2 className="text-2xl font-bold text-gray-800 text-center">
           {edit ? "Edit" : "Add"} Product
         </h2>
-        <form onSubmit={edit ? handleEdit : handleSubmit}>
+        <form
+          onSubmit={edit ? handleEdit : handleSubmit}
+          className={`${submitting && "pointer-events-none"}`}
+        >
           <div className="mb-1 text-center relative">
             {!edit && (
               <>
@@ -432,6 +439,7 @@ const AddProduct = ({ edit, reupload }) => {
             <CKEditor
               editor={ClassicEditor}
               id="blogDescription"
+              className="p-4"
               config={{
                 toolbar: [
                   "undo",
@@ -486,7 +494,11 @@ const AddProduct = ({ edit, reupload }) => {
             }`}
             disabled={submitting}
           >
-            {edit ? "Edit Product" : "Add Product"}
+            {submitting
+              ? "Please Wait..."
+              : edit
+              ? "Edit Product"
+              : "Add Product"}
           </button>
         </form>
       </div>

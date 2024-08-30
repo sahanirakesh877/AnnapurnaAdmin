@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { DeleteConfirmation } from "../components/deleteConfirmation";
 
 const CategoryProducts = () => {
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [delCon, setDelCon] = useState(false);
 
   const { categoryId } = useParams();
 
@@ -16,10 +18,9 @@ const CategoryProducts = () => {
   useEffect(() => {
     const fetchCategoryProducts = async () => {
       setLoading(true);
-      console.log("fetching: ", "http://localhost:5000/api/v1/products");
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/v1/products",
+          `${import.meta.env.VITE_SERVERAPI}/api/v1/products`,
           {
             params: {
               categoryId,
@@ -38,6 +39,7 @@ const CategoryProducts = () => {
 
   async function handleDelete(id) {
     try {
+      setDeleting(true);
       const response = await axios.delete(
         `${import.meta.env.VITE_SERVERAPI}/api/v1/products/${id}`,
         {
@@ -48,10 +50,12 @@ const CategoryProducts = () => {
       );
       if (response.data.success) {
         toast.success(response.data.message);
+        setDeleting(false);
         setProducts(response.data.products);
       }
     } catch (err) {
       console.error(err);
+      setDeleting(false);
     }
   }
 
@@ -119,10 +123,22 @@ const CategoryProducts = () => {
                       </Link>
                       <button
                         className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300"
-                        onClick={() => handleDelete(product._id)}
+                        // onClick={() => handleDelete(product._id)}
+                        onClick={() => setDelCon(true)}
                       >
                         Delete
                       </button>
+                      {delCon && (
+                        <DeleteConfirmation
+                          type={"product"}
+                          name={product.name}
+                          delFunc={() => {
+                            handleDelete(product._id);
+                          }}
+                          setDelCon={setDelCon}
+                          deleting={deleting}
+                        />
+                      )}
                     </td>
                   </tr>
                 ))}

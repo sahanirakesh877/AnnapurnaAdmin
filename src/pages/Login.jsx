@@ -10,6 +10,8 @@ const Login = () => {
 
   const dispatch = useDispatch();
 
+  const [logging, setLogging] = useState(false);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -24,9 +26,10 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLogging(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/v1/login",
+        `${import.meta.env.VITE_SERVERAPI}/api/v1/login`,
         formData
       );
 
@@ -47,13 +50,16 @@ const Login = () => {
           })
         );
       } else {
-        toast.error("something went wrong logging in");
+        toast.error(response.data.message);
       }
 
       console.log("Login successful", response.data);
     } catch (error) {
       toast.error("Error during login");
       console.error("Error during login", error);
+      setLogging(false);
+    } finally {
+      setLogging(false);
     }
   };
 
@@ -101,9 +107,12 @@ const Login = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300"
+            className={`w-full bg-blue-600 text-white py-2 px-4 rounded-lg transition duration-300 ${
+              logging ? "cursor-not-allowed opacity-60" : "hover:bg-blue-700"
+            }`}
+            disabled={logging}
           >
-            Login
+            {logging ? "Logging..." : "Login"}
           </button>
         </form>
         {/* <p className="mt-4 text-center text-gray-600">

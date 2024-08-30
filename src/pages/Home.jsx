@@ -3,6 +3,7 @@ import Footer from "../components/Footer";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { DeleteConfirmation } from "../components/deleteConfirmation";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -10,6 +11,8 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  const [delCon, setDelCon] = useState(false);
 
   useEffect(() => {
     async function getProducts() {
@@ -136,10 +139,21 @@ const Home = () => {
                       </button> */}
                         <button
                           className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300"
-                          onClick={() => handleDelete(product._id)}
+                          // onClick={() => handleDelete(product._id)}
+                          onClick={() => setDelCon(true)}
                         >
                           Delete
                         </button>
+                        {delCon && (
+                          <DeleteConfirmation
+                            type={"product"}
+                            name={product.name}
+                            delFunc={() => {
+                              handleDelete(product._id);
+                            }}
+                            setDelCon={setDelCon}
+                          />
+                        )}
                       </td>
                     </tr>
                   ))}

@@ -38,7 +38,7 @@ const EditProduct = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/products",
+        `${import.meta.env.VITE_SERVERAPI}/products`,
         formDataToSend,
         {
           headers: {

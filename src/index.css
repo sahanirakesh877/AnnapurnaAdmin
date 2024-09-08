@@ -6,3 +6,7 @@
   /* border: 1px solid black; */
   line-height: normal;
 }
+
+.ck-editor__editable {
+  padding: 0 25px 0 25px !important
+}

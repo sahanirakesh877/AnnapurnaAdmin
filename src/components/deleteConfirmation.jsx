@@ -8,7 +8,8 @@ export function DeleteConfirmation({
   return (
     <div className="h-screen w-screen bg-[#000000a7] flex justify-center items-center fixed top-0 left-0 text-white text-xl flex-col">
       <p>
-        Do you really want to delete this {type} ({name})?
+        Do you really want to delete this {type}{" "}
+        <span className="font-semibold">({name})?</span>
       </p>
       <div className="flex">
         <button

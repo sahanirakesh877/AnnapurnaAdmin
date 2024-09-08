@@ -9,7 +9,11 @@ const GetCategory = () => {
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  const [categoryTitle, setCategoryTitle] = useState();
+
   const [delCon, setDelCon] = useState(false);
+
+  const [categoryId, setCategoryId] = useState();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -91,41 +95,47 @@ const GetCategory = () => {
                 </tr>
               </thead>
               <tbody>
-                {category.map((cat) => (
-                  <tr key={cat._id} className="hover:bg-gray-200">
-                    <td className="px-4 py-2 border-b text-center border-r-2">
-                      {cat.title}
-                    </td>
-                    <td className="px-4 py-2 border-b flex items-center text-start">
-                      <Link
-                        to={`/getcategory/${cat._id}`}
-                        className="px-2 py-1 bg-blue-500 text-white rounded mr-2 hover:bg-blue-600 transition duration-300"
-                      >
-                        View Products
-                      </Link>
-                      <button
-                        // onClick={() => handleDelete(cat._id)}
-                        onClick={() => setDelCon(true)}
-                        className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300 "
-                        disabled={deleting}
-                      >
-                        {deleting ? "Deleting..." : "Delete"}
-                      </button>
-                      {delCon && (
-                        <DeleteConfirmation
-                          type={"category"}
-                          name={cat.title}
-                          delFunc={() => {
-                            handleDelete(cat._id);
+                {category.map((cat) => {
+                  return (
+                    <tr key={cat._id} className="hover:bg-gray-200">
+                      <td className="px-4 py-2 border-b text-center border-r-2">
+                        {cat.title}
+                      </td>
+                      <td className="px-4 py-2 border-b flex items-center text-start">
+                        <Link
+                          to={`/getcategory/${cat._id}`}
+                          className="px-2 py-1 bg-blue-500 text-white rounded mr-2 hover:bg-blue-600 transition duration-300"
+                        >
+                          View Products
+                        </Link>
+                        <button
+                          // onClick={() => handleDelete(cat._id)}
+                          onClick={() => {
+                            setDelCon(true);
+                            setCategoryTitle(cat.title);
+                            setCategoryId(cat._id);
                           }}
-                          setDelCon={setDelCon}
-                        />
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                          className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300 "
+                          disabled={deleting}
+                        >
+                          {deleting ? "Deleting..." : "Delete"}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
+            {delCon && (
+              <DeleteConfirmation
+                type={"category"}
+                name={categoryTitle}
+                delFunc={() => {
+                  handleDelete(categoryId);
+                }}
+                setDelCon={setDelCon}
+              />
+            )}
           </div>
         )}
       </main>

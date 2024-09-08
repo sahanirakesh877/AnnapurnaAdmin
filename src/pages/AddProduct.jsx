@@ -267,7 +267,7 @@ const AddProduct = ({ edit, reupload }) => {
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   required
                 />
-                <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-full mx-auto flex items-center justify-center relative">
+                <div className="w-60 h-60 border-2 border-dashed border-gray-300 rounded-full mx-auto flex items-center justify-center relative">
                   {imagePreview ? (
                     <img
                       src={imagePreview}
@@ -420,7 +420,7 @@ const AddProduct = ({ edit, reupload }) => {
             </div>
           </div>
 
-          <div className="mb-2">
+          <div className="mb-2 prose">
             <label
               className="block text-gray-700 text-sm font-semibold mb-2"
               htmlFor="description"

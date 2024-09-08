@@ -11,6 +11,10 @@ const CategoryProducts = () => {
 
   const { categoryId } = useParams();
 
+  const [productName, setProductName] = useState("");
+
+  const [productId, setProductId] = useState("");
+
   console.log(categoryId);
 
   const [products, setProducts] = useState([]);
@@ -69,7 +73,9 @@ const CategoryProducts = () => {
         </h2>
 
         {loading ? (
-          <div className="text-center py-4">Loading Products...</div>
+          <div className="text-center py-4 h-full w-full">
+            Loading Products...
+          </div>
         ) : products.length < 1 ? (
           <div className="text-center py-4">No Product for this category</div>
         ) : (
@@ -114,7 +120,7 @@ const CategoryProducts = () => {
                         : "please specify category again"}
                     </td>
                     <td className="px-4 py-2 border-r-2">Rs {product.price}</td>
-                    <td className="px-4 py-2 flex justify-center items-center">
+                    <td className="px-4 py-2">
                       <Link
                         to={`/product/${product._id}`}
                         className="px-2 py-1 bg-blue-500 text-white rounded mr-2 hover:bg-blue-600 transition duration-300"
@@ -124,26 +130,29 @@ const CategoryProducts = () => {
                       <button
                         className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300"
                         // onClick={() => handleDelete(product._id)}
-                        onClick={() => setDelCon(true)}
+                        onClick={() => {
+                          setDelCon(true);
+                          setProductName(product.name); // Set the name of the clicked product
+                          setProductId(product._id); // Set the ID of the clicked product
+                        }}
                       >
                         Delete
                       </button>
-                      {delCon && (
-                        <DeleteConfirmation
-                          type={"product"}
-                          name={product.name}
-                          delFunc={() => {
-                            handleDelete(product._id);
-                          }}
-                          setDelCon={setDelCon}
-                          deleting={deleting}
-                        />
-                      )}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            {delCon && (
+              <DeleteConfirmation
+                type={"product"}
+                name={productName}
+                delFunc={() => {
+                  handleDelete(productId);
+                }}
+                setDelCon={setDelCon}
+              />
+            )}
           </div>
         )}
       </main>

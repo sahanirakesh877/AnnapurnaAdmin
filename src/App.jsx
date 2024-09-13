@@ -125,6 +125,10 @@ const App = () => {
             <Route path="/product" element={<Home />} />
             <Route path="/product/:id" element={<ProductDetails />} />
             <Route
+              path="/product/:id/catalogUpload"
+              element={<AddProduct upload={true} />}
+            />
+            <Route
               path="/product/:id/edit"
               element={<AddProduct edit={true} />}
             />

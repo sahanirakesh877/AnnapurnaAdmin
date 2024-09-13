@@ -50,7 +50,7 @@ const GetCategory = () => {
       );
       if (response.data.success) {
         toast.success(response.data.message);
-
+        setDelCon(false);
         // Update the category list after deletion
         setCategory((prevCategories) =>
           prevCategories.filter((cat) => cat._id !== id)

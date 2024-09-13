@@ -70,6 +70,41 @@ export default function ProductDetails() {
     }
   }
 
+  // async function catalogDownloadHandler() {
+  //   try {
+  //     const response = await axios.get(
+  //       `${import.meta.env.VITE_SERVERAPI}/api/v1/products/${id}/catalog`
+  //     );
+  //     console.log(response);
+  //   } catch (error) {
+  //     setError(error);
+  //     console.error(error);
+  //   }
+  // }
+
+  async function catalogDeleteHandler() {
+    try {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_SERVERAPI}/api/v1/products/${id}/catalog`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      console.log(response);
+      if (response.data.success) {
+        toast(response.data.message);
+        setSelectedProduct(response.data.product);
+      } else {
+        console.log(response.data.message);
+      }
+    } catch (error) {
+      setError(error);
+      console.error(error);
+    }
+  }
+
   if (error) {
     return (
       <div className="h-full w-full text-rose-600 flex justify-center items-center text-3xl font-semibold">
@@ -167,9 +202,39 @@ export default function ProductDetails() {
                       <span className="title-font font-medium text-2xl text-gray-900">
                         Rs.{selectedProduct.price}
                       </span>
-                      <button className="flex ml-auto text-white bg-red-700 border-0 py-2 px-6 focus:outline-none hover:bg-red-600 rounded">
-                        Download Catalogue
-                      </button>
+                      {selectedProduct.catalog ? (
+                        <div className="flex ml-auto flex-col">
+                          <Link
+                            to="./catalogUpload"
+                            className=" text-white bg-slate-700 border-0 py-2 px-6 focus:outline-none hover:bg-slate-600 rounded"
+                          >
+                            Reupload Catalogue
+                          </Link>
+                          <a
+                            href={`${
+                              import.meta.env.VITE_SERVERAPI
+                            }/api/v1/products/${id}/catalog`}
+                            target="_blank"
+                            className=" text-white bg-red-700 border-0 py-2 px-6 focus:outline-none hover:bg-red-600 rounded mt-4"
+                            // onClick={() => catalogDownloadHandler()}
+                          >
+                            Download Catalogue
+                          </a>
+                          <button
+                            className=" text-white bg-red-700 border-0 py-2 px-6 focus:outline-none hover:bg-red-600 rounded mt-4"
+                            onClick={() => catalogDeleteHandler()}
+                          >
+                            Delete Catalogue
+                          </button>
+                        </div>
+                      ) : (
+                        <Link
+                          to="./catalogUpload"
+                          className="flex ml-auto text-white bg-slate-700 border-0 py-2 px-6 focus:outline-none hover:bg-slate-600 rounded"
+                        >
+                          Upload Catalog
+                        </Link>
+                      )}
                       {/* <button className="rounded-full w-10 h-10 bg-gray-200 p-0 border-0 inline-flex items-center justify-center text-gray-500 ml-4">
                   <svg
                     fill="currentColor"
@@ -196,7 +261,7 @@ export default function ProductDetails() {
                     />
                   )}
                   <img
-                    alt="ecommerce"
+                    alt={selectedProduct.title}
                     className="lg:w-1/2 w-full h-[500px] object-contain rounded"
                     src={`${
                       import.meta.env.VITE_SERVERAPI

@@ -23,10 +23,10 @@ import {
 } from "ckeditor5";
 import "ckeditor5/ckeditor5.css";
 
-const AddProduct = ({ edit, reupload }) => {
+const AddProduct = ({ edit, upload }) => {
   const navigate = useNavigate();
   let id;
-  if (edit) {
+  if (edit || upload) {
     id = useParams().id;
   }
 
@@ -81,6 +81,8 @@ const AddProduct = ({ edit, reupload }) => {
 
   const [submitting, setSubmitting] = useState(false);
 
+  const [catalog, setCatalog] = useState();
+
   useEffect(() => {
     async function getCategories() {
       try {
@@ -125,6 +127,7 @@ const AddProduct = ({ edit, reupload }) => {
     formDataToSend.append("price", formData.price);
     formDataToSend.append("category", formData.category);
     formDataToSend.append("brand", formData.brand);
+    formDataToSend.append("catalogFile", catalog);
 
     try {
       const response = await axios.post(
@@ -137,6 +140,7 @@ const AddProduct = ({ edit, reupload }) => {
           },
         }
       );
+      console.log(response);
       if (response.data.success) {
         toast.success(response.data.message);
         setFormData({
@@ -149,7 +153,6 @@ const AddProduct = ({ edit, reupload }) => {
         });
         setImagePreview(null);
         navigate("/");
-        console.log("Product added successfully", response.data);
       } else {
         toast.error("smthng went wrong");
       }
@@ -231,7 +234,7 @@ const AddProduct = ({ edit, reupload }) => {
         setCategories(response.data.categories);
         toast.success(response.data.message);
       } else {
-        toast.error(response.data.error);
+        toast.error(response.data.message);
       }
     } catch (err) {
       console.error(err);
@@ -239,6 +242,37 @@ const AddProduct = ({ edit, reupload }) => {
     } finally {
       setLoading(false);
       setAddCategory(false);
+    }
+  };
+
+  const handleCatelogUpload = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const formDataToSend = new FormData();
+
+      formDataToSend.append("catalogFile", catalog);
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_SERVERAPI}/api/v1/products/${id}/catalog`,
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (response.data.success) {
+        toast.success(response.data.message);
+        navigate(`/product/${id}`);
+      } else {
+        toast.error(response.data.error);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -250,14 +284,17 @@ const AddProduct = ({ edit, reupload }) => {
     >
       <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-lg">
         <h2 className="text-2xl font-bold text-gray-800 text-center">
-          {edit ? "Edit" : "Add"} Product
+          {edit ? "Edit" : upload ? "Catalog" : "Add"} Product{" "}
+          {upload && "Upload"}
         </h2>
         <form
-          onSubmit={edit ? handleEdit : handleSubmit}
+          onSubmit={
+            edit ? handleEdit : upload ? handleCatelogUpload : handleSubmit
+          }
           className={`${submitting && "pointer-events-none"}`}
         >
           <div className="mb-1 text-center relative">
-            {!edit && (
+            {!edit && !upload && (
               <>
                 <input
                   type="file"
@@ -285,51 +322,54 @@ const AddProduct = ({ edit, reupload }) => {
               </>
             )}
           </div>
-          <div className="mb-2">
-            <label
-              className="block text-gray-700 text-sm font-semibold mb-1"
-              htmlFor="name"
-            >
-              Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
 
-          <div className="mb-2">
-            <label
-              className="block text-gray-700 text-sm font-semibold mb-1"
-              htmlFor="price"
-            >
-              Price
-            </label>
-            <input
-              type="text"
-              name="price"
-              id="price"
-              value={formData.price}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
+          {!upload && (
+            <>
+              <div className="mb-2">
+                <label
+                  className="block text-gray-700 text-sm font-semibold mb-1"
+                  htmlFor="name"
+                >
+                  Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  id="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
 
-          <div className="flex justify-between mb-2">
-            <div className="w-full pr-2">
-              <label
-                className="block text-gray-700 text-sm font-semibold mb-1"
-                htmlFor="category"
-              >
-                Category
-              </label>
-              {/* <input
+              <div className="mb-2">
+                <label
+                  className="block text-gray-700 text-sm font-semibold mb-1"
+                  htmlFor="price"
+                >
+                  Price
+                </label>
+                <input
+                  type="text"
+                  name="price"
+                  id="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+
+              <div className="flex justify-between mb-2">
+                <div className="w-full pr-2">
+                  <label
+                    className="block text-gray-700 text-sm font-semibold mb-1"
+                    htmlFor="category"
+                  >
+                    Category
+                  </label>
+                  {/* <input
                 type="text"
                 name="category"
                 id="category"
@@ -338,96 +378,120 @@ const AddProduct = ({ edit, reupload }) => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               /> */}
-              {loading ? (
-                <div className="d-flex">
-                  Please wait <BeatLoader color="black" size={20} />
+                  {loading ? (
+                    <div className="d-flex">
+                      Please wait <BeatLoader color="black" size={20} />
+                    </div>
+                  ) : addCategory ? (
+                    <>
+                      <input
+                        type="text"
+                        placeholder="Category Name"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={newCategory}
+                        onChange={(e) => setNewCategory(e.target.value)}
+                      />
+                      <button
+                        className={`p-2 bg-green-800 text-white rounded-md m-2 ${
+                          loading ? "cursor-wait" : ""
+                        }`}
+                        onClick={addCategoryHandler}
+                        disabled={loading}
+                      >
+                        {loading ? "Adding" : "Add"}
+                      </button>
+                      <button
+                        className="p-2 bg-red-800 text-white rounded-md m-2"
+                        onClick={() => setAddCategory(false)}
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <select
+                      name="category"
+                      id="blogcategory"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={formData.category}
+                      onChange={(e) => {
+                        if (e.target.value === "add-new") {
+                          setAddCategory(true);
+                        } else {
+                          setFormData((prev) => ({
+                            ...prev,
+                            ["category"]: e.target.value,
+                          }));
+                        }
+                      }}
+                      required
+                    >
+                      <option value="">Choose...</option>
+                      {!loading && categories && categories.length ? (
+                        categories.map((x, i) => (
+                          <option value={x._id} key={i}>
+                            {x.title}
+                          </option>
+                        ))
+                      ) : (
+                        <option value="" disabled>
+                          No categories
+                        </option>
+                      )}
+                      <option value="add-new">+ Add Category</option>
+                    </select>
+                  )}
                 </div>
-              ) : addCategory ? (
-                <>
+                <div className="w-full pl-2">
+                  <label
+                    className="block text-gray-700 text-sm font-semibold mb-1"
+                    htmlFor="brand"
+                  >
+                    Brand
+                  </label>
                   <input
                     type="text"
-                    placeholder="Category Name"
+                    name="brand"
+                    id="brand"
+                    value={formData.brand}
+                    onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
+                    required
                   />
-                  <button
-                    className={`p-2 bg-green-800 text-white rounded-md m-2 ${
-                      loading ? "cursor-wait" : ""
-                    }`}
-                    onClick={addCategoryHandler}
-                    disabled={loading}
-                  >
-                    {loading ? "Adding" : "Add"}
-                  </button>
-                  <button
-                    className="p-2 bg-red-800 text-white rounded-md m-2"
-                    onClick={() => setAddCategory(false)}
-                  >
-                    Cancel
-                  </button>
-                </>
-              ) : (
-                <select
-                  name="category"
-                  id="blogcategory"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={formData.category}
-                  onChange={(e) => {
-                    if (e.target.value === "add-new") {
-                      setAddCategory(true);
-                    } else {
-                      setFormData((prev) => ({
-                        ...prev,
-                        ["category"]: e.target.value,
-                      }));
-                    }
-                  }}
-                  required
-                >
-                  <option value="">Choose...</option>
-                  {!loading && categories && categories.length ? (
-                    categories.map((x, i) => (
-                      <option value={x._id} key={i}>
-                        {x.title}
-                      </option>
-                    ))
-                  ) : (
-                    <option value="" disabled>
-                      No categories
-                    </option>
-                  )}
-                  <option value="add-new">+ Add Category</option>
-                </select>
-              )}
-            </div>
-            <div className="w-full pl-2">
+                </div>
+              </div>
+            </>
+          )}
+
+          {!edit && (
+            <div className="mb-4">
               <label
-                className="block text-gray-700 text-sm font-semibold mb-1"
-                htmlFor="brand"
+                className="block text-gray-700 text-sm font-semibold mb-2"
+                htmlFor="catalogFile"
               >
-                Brand
+                Catalog (PDF only)
               </label>
               <input
-                type="text"
-                name="brand"
-                id="brand"
-                value={formData.brand}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
+                onChange={(e) => setCatalog(e.target.files[0])}
+                type="file"
+                id="catalogFile"
+                accept=".pdf"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
+              {catalog && (
+                <p className="mt-2 text-sm text-gray-600">{catalog.name}</p>
+              )}
             </div>
-          </div>
+          )}
 
-          <div className="mb-2 prose">
-            <label
-              className="block text-gray-700 text-sm font-semibold mb-2"
-              htmlFor="description"
-            >
-              Description
-            </label>
-            {/* <textarea
+          {!upload && (
+            <div className="mb-2 prose">
+              <label
+                className="block text-gray-700 text-sm font-semibold mb-2"
+                htmlFor="description"
+              >
+                Description
+              </label>
+              {/* <textarea
               name="description"
               id="description"
               value={formData.description}
@@ -436,57 +500,58 @@ const AddProduct = ({ edit, reupload }) => {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             /> */}
-            <CKEditor
-              editor={ClassicEditor}
-              id="blogDescription"
-              className="p-4"
-              config={{
-                toolbar: [
-                  "undo",
-                  "redo",
-                  "|",
-                  "heading",
-                  "|",
-                  "bold",
-                  "italic",
-                  "|",
-                  "link",
-                  "insertTable",
-                  "mediaEmbed",
-                  "|",
-                  "bulletedList",
-                  "numberedList",
-                  "indent",
-                  "outdent",
-                ],
-                plugins: [
-                  Bold,
-                  Essentials,
-                  Heading,
-                  Indent,
-                  IndentBlock,
-                  Italic,
-                  Link,
-                  List,
-                  MediaEmbed,
-                  Paragraph,
-                  Table,
-                  Undo,
-                ],
-              }}
-              data={formData.description}
-              onReady={(editor) => {
-                editorRef.current = editor;
-              }}
-              onChange={(event, editor) => {
-                const data = editor.getData();
-                setFormData((prev) => ({
-                  ...prev,
-                  description: data,
-                }));
-              }}
-            />
-          </div>
+              <CKEditor
+                editor={ClassicEditor}
+                id="blogDescription"
+                className="p-4"
+                config={{
+                  toolbar: [
+                    "undo",
+                    "redo",
+                    "|",
+                    "heading",
+                    "|",
+                    "bold",
+                    "italic",
+                    "|",
+                    "link",
+                    "insertTable",
+                    "mediaEmbed",
+                    "|",
+                    "bulletedList",
+                    "numberedList",
+                    "indent",
+                    "outdent",
+                  ],
+                  plugins: [
+                    Bold,
+                    Essentials,
+                    Heading,
+                    Indent,
+                    IndentBlock,
+                    Italic,
+                    Link,
+                    List,
+                    MediaEmbed,
+                    Paragraph,
+                    Table,
+                    Undo,
+                  ],
+                }}
+                data={formData.description}
+                onReady={(editor) => {
+                  editorRef.current = editor;
+                }}
+                onChange={(event, editor) => {
+                  const data = editor.getData();
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: data,
+                  }));
+                }}
+              />
+            </div>
+          )}
           <button
             type="submit"
             className={`w-full bg-red-600 text-white py-2 px-4 rounded-lg  transition duration-300 ${
@@ -498,6 +563,8 @@ const AddProduct = ({ edit, reupload }) => {
               ? "Please Wait..."
               : edit
               ? "Edit Product"
+              : upload
+              ? "Upload Catalog"
               : "Add Product"}
           </button>
         </form>

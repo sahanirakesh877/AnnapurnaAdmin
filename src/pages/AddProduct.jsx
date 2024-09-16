@@ -330,7 +330,7 @@ const AddProduct = ({ edit, upload }) => {
                   className="block text-gray-700 text-sm font-semibold mb-1"
                   htmlFor="name"
                 >
-                  Name
+                  Name*
                 </label>
                 <input
                   type="text"
@@ -348,15 +348,15 @@ const AddProduct = ({ edit, upload }) => {
                   className="block text-gray-700 text-sm font-semibold mb-1"
                   htmlFor="price"
                 >
-                  Price
+                  Price*
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   name="price"
                   id="price"
                   value={formData.price}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 "
                   required
                 />
               </div>
@@ -367,7 +367,7 @@ const AddProduct = ({ edit, upload }) => {
                     className="block text-gray-700 text-sm font-semibold mb-1"
                     htmlFor="category"
                   >
-                    Category
+                    Category*
                   </label>
                   {/* <input
                 type="text"
@@ -446,7 +446,7 @@ const AddProduct = ({ edit, upload }) => {
                     className="block text-gray-700 text-sm font-semibold mb-1"
                     htmlFor="brand"
                   >
-                    Brand
+                    Brand*
                   </label>
                   <input
                     type="text"
@@ -468,7 +468,7 @@ const AddProduct = ({ edit, upload }) => {
                 className="block text-gray-700 text-sm font-semibold mb-2"
                 htmlFor="catalogFile"
               >
-                Catalog (PDF only)
+                Catalog (PDF only) {!upload && "(optional)"}
               </label>
               <input
                 onChange={(e) => setCatalog(e.target.files[0])}
@@ -489,7 +489,7 @@ const AddProduct = ({ edit, upload }) => {
                 className="block text-gray-700 text-sm font-semibold mb-2"
                 htmlFor="description"
               >
-                Description
+                Description*
               </label>
               {/* <textarea
               name="description"

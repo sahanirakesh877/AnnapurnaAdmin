@@ -12,12 +12,12 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
-
   const [delCon, setDelCon] = useState(false);
-
   const [productName, setProductName] = useState("");
-
   const [productId, setProductId] = useState("");
+
+  const [currentPage, setCurrentPage] = useState(0); // Pagination state
+  const productsPerPage = 6; // Number of products per page
 
   useEffect(() => {
     async function getProducts() {
@@ -62,6 +62,17 @@ const Home = () => {
     }
   }
 
+  // Pagination logic
+  const pageCount = Math.ceil(products.length / productsPerPage);
+  const displayProducts = products.slice(
+    currentPage * productsPerPage,
+    (currentPage + 1) * productsPerPage
+  );
+
+  const handlePageClick = ({ selected }) => {
+    setCurrentPage(selected);
+  };
+
   if (!loading && products.length < 1) {
     return (
       <div className="h-full w-full border border-black flex justify-center items-center text-xl font-semibold flex-col">
@@ -80,12 +91,12 @@ const Home = () => {
     <>
       <div className="flex flex-col min-h-screen w-full">
         <main className="flex-grow bg-gray-100 px-6">
-          <h2 className="text-2xl font-bold text-gray-800  text-center py-2">
+          <h2 className="text-2xl font-bold text-gray-800 text-center py-2">
             Product List
           </h2>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full bg-white rounded-lg shadow-md border-2 mb-8 text-lg py-6">
+            <table className="min-w-full bg-white rounded-lg shadow-md border-2 mb-8 text-lg py-6 min-h-screen">
               <thead className="bg-[#16189e] text-white text-left">
                 <tr>
                   <th className="px-4 py-2 border-2 border-gray-300">Image</th>
@@ -94,20 +105,19 @@ const Home = () => {
                     Category
                   </th>
                   <th className="px-4 py-2 border-2 border-gray-300">Price</th>
-
                   <th className="px-4 py-2 border-2 border-gray-300">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {products.map((product, index) => {
+                {displayProducts.map((product, index) => {
                   return (
                     <tr
                       key={index}
                       className="hover:bg-gray-50 border-b-2 text-black "
                     >
-                      <td className="px-4 py-2 flex justify-center ">
+                      <td className="px-4 py-2 flex justify-center">
                         <img
                           src={`${
                             import.meta.env.VITE_SERVERAPI
@@ -148,6 +158,7 @@ const Home = () => {
                 })}
               </tbody>
             </table>
+
             {delCon && (
               <DeleteConfirmation
                 type={"product"}
@@ -158,6 +169,34 @@ const Home = () => {
                 setDelCon={setDelCon}
               />
             )}
+
+            {/* Pagination Component */}
+            <ReactPaginate
+              previousLabel={<span className="block">Previous</span>} // Ensure full button is clickable
+              nextLabel={<span className="block">Next</span>}
+              breakLabel={<span className="block">...</span>}
+              pageCount={pageCount}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={5}
+              onPageChange={handlePageClick}
+              containerClassName={
+                "flex justify-center space-x-2 my-4 text-red-800 text-lg"
+              }
+              pageClassName={
+                "px-3 py-1 rounded-md bg-white border border-red-300 hover:bg-red-200 transition block"
+              }
+              pageLinkClassName={"block w-full h-full text-center"} // Make the entire page number area clickable
+              previousClassName={
+                "px-4 py-2 rounded-md bg-red-800 text-white hover:bg-red-700 transition block"
+              }
+              nextClassName={
+                "px-4 py-2 rounded-md bg-red-800 text-white hover:bg-red-700 transition block"
+              }
+              activeClassName={
+                "px-3 py-1 rounded-md bg-blue-500 text-white font-bold block"
+              }
+              disabledClassName={"opacity-50 cursor-not-allowed block"}
+            />
           </div>
         </main>
         <Footer />

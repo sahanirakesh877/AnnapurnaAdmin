@@ -33,6 +33,18 @@ const SideBar = () => {
           >
             Category
           </Link>
+          <Link
+            to="/gallery"
+            className="mb-4 hover:bg-gray-700 p-2 rounded border text-center"
+          >
+            Gallery
+          </Link>
+          <Link
+            to="/event"
+            className="mb-4 hover:bg-gray-700 p-2 rounded border text-center"
+          >
+            Event
+          </Link>
 
           <Link
             // to="/profile"

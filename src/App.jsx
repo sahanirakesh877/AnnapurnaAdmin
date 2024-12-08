@@ -15,6 +15,11 @@ import { authAction } from "./redux/authSlice";
 import toast from "react-hot-toast";
 import GetCategory from "./pages/GetCategory";
 import CategoryProducts from "./pages/categoryProducts";
+import GalleryUpload from "./pages/galleryUpload";
+import Gallery from "./pages/gallery";
+import EventUpload from "./pages/eventUpload";
+import Events from "./pages/events";
+import EventDetails from "./pages/eventPhotos";
 
 const App = () => {
   const loggedInUser = useSelector((state) => state.userReducer.loggedInUser);
@@ -136,6 +141,12 @@ const App = () => {
             <Route path="/addproducts" element={<AddProduct />} />
             {/* <Route path="/" element={<Home />} /> */}
             <Route path="/getcategory" element={<GetCategory />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/event" element={<Events />} />
+            <Route path="/event/add" element={<EventUpload />} />
+            <Route path="/event/:eventId" element={<EventDetails />} />
+            <Route path="/event/:eventId/add" element={<EventUpload />} />
+            <Route path="/gallery/add" element={<GalleryUpload />} />
             <Route
               path="/getcategory/:categoryId"
               element={<CategoryProducts />}
